@@ -289,17 +289,17 @@ class TotalDerivTestsGaussAEPOpt_VestasV80(unittest.TestCase):
 
         # air_density = 1.1716  # kg/m^3
         Ar = 0.25 * np.pi * rotor_diameter ** 2
-        # cp_curve_vel = ct_curve[:, 0]
+        # cp_curve_wind_speed = ct_curve[:, 0]
         power_data = np.loadtxt('./input_files/niayifar_vestas_v80_power_curve_observed.txt', delimiter=',')
-        # cp_curve_cp = niayifar_power_model(cp_curve_vel)/(0.5*air_density*cp_curve_vel**3*Ar)
+        # cp_curve_cp = niayifar_power_model(cp_curve_wind_speed)/(0.5*air_density*cp_curve_wind_speed**3*Ar)
         cp_curve_cp = power_data[:, 1] * (1E6) / (0.5 * air_density * power_data[:, 0] ** 3 * Ar)
-        cp_curve_vel = power_data[:, 0]
-        cp_curve_spline = UnivariateSpline(cp_curve_vel, cp_curve_cp, ext='const')
+        cp_curve_wind_speed = power_data[:, 0]
+        cp_curve_spline = UnivariateSpline(cp_curve_wind_speed, cp_curve_cp, ext='const')
         cp_curve_spline.set_smoothing_factor(.0001)
         # cp_curve_spline = None
         # xs = np.linspace(0, 35, 1000)
         # plt.plot(xs, cp_curve_spline(xs))
-        # plt.scatter(cp_curve_vel, cp_curve_cp)
+        # plt.scatter(cp_curve_wind_speed, cp_curve_cp)
         # plt.show()
         # quit()
         nRotorPoints = 1
@@ -398,7 +398,7 @@ class TotalDerivTestsGaussAEPOpt_VestasV80(unittest.TestCase):
         # prob['cut_in_speed'] = np.ones(nTurbines)*7.
         prob['rated_power'] = np.ones(nTurbines) * 2000.
         prob['cp_curve_cp'] = cp_curve_cp
-        prob['cp_curve_vel'] = cp_curve_vel
+        prob['cp_curve_wind_speed'] = cp_curve_wind_speed
 
         prob['model_params:wake_combination_method'] = wake_combination_method
         prob['model_params:ti_calculation_method'] = ti_calculation_method
@@ -494,8 +494,8 @@ class TotalDerivTestsGaussAEPOpt_NREL5MW(unittest.TestCase):
         # air_density = 1.1716  # kg/m^3
         Ar = 0.25 * np.pi * rotor_diameter ** 2
         cp_curve_cp = cpct_data[:, 1]
-        cp_curve_vel = cpct_data[:, 0]
-        cp_curve_spline = UnivariateSpline(cp_curve_vel, cp_curve_cp, ext='const')
+        cp_curve_wind_speed = cpct_data[:, 0]
+        cp_curve_spline = UnivariateSpline(cp_curve_wind_speed, cp_curve_cp, ext='const')
         cp_curve_spline.set_smoothing_factor(.0001)
 
         nRotorPoints = 1
@@ -517,7 +517,7 @@ class TotalDerivTestsGaussAEPOpt_NREL5MW(unittest.TestCase):
         k_calc = 0.3837 * TI + 0.003678
 
         wake_combination_method = 1
-        ti_calculation_method = 0
+        ti_calculation_method = 5
         calc_k_star = True
         sort_turbs = True
         wake_model_version = 2014
@@ -594,7 +594,7 @@ class TotalDerivTestsGaussAEPOpt_NREL5MW(unittest.TestCase):
         # prob['cut_in_speed'] = np.ones(nTurbines)*7.
         prob['rated_power'] = np.ones(nTurbines) * 2000.
         prob['cp_curve_cp'] = cp_curve_cp
-        prob['cp_curve_vel'] = cp_curve_vel
+        prob['cp_curve_wind_speed'] = cp_curve_wind_speed
 
         prob['model_params:wake_combination_method'] = wake_combination_method
         prob['model_params:ti_calculation_method'] = ti_calculation_method
@@ -768,17 +768,17 @@ class GradientTestsGauss(unittest.TestCase):
 
         # air_density = 1.1716  # kg/m^3
         Ar = 0.25 * np.pi * rotor_diameter ** 2
-        # cp_curve_vel = ct_curve[:, 0]
+        # cp_curve_wind_speed = ct_curve[:, 0]
         power_data = np.loadtxt('./input_files/niayifar_vestas_v80_power_curve_observed.txt', delimiter=',')
-        # cp_curve_cp = niayifar_power_model(cp_curve_vel)/(0.5*air_density*cp_curve_vel**3*Ar)
+        # cp_curve_cp = niayifar_power_model(cp_curve_wind_speed)/(0.5*air_density*cp_curve_wind_speed**3*Ar)
         cp_curve_cp = power_data[:, 1] * (1E6) / (0.5 * air_density * power_data[:, 0] ** 3 * Ar)
-        cp_curve_vel = power_data[:, 0]
-        cp_curve_spline = UnivariateSpline(cp_curve_vel, cp_curve_cp, ext='const')
+        cp_curve_wind_speed = power_data[:, 0]
+        cp_curve_spline = UnivariateSpline(cp_curve_wind_speed, cp_curve_cp, ext='const')
         cp_curve_spline.set_smoothing_factor(.0001)
         # cp_curve_spline = None
         # xs = np.linspace(0, 35, 1000)
         # plt.plot(xs, cp_curve_spline(xs))
-        # plt.scatter(cp_curve_vel, cp_curve_cp)
+        # plt.scatter(cp_curve_wind_speed, cp_curve_cp)
         # plt.show()
         # quit()
         nRotorPoints = 1
@@ -813,7 +813,7 @@ class GradientTestsGauss(unittest.TestCase):
                                               wake_model=gauss_wrapper, wake_model_options=wake_model_options,
                                               params_IdepVar_func=add_gauss_params_IndepVarComps,
                                               params_IndepVar_args={'nRotorPoints': nRotorPoints},
-                                              cp_curve_spline=cp_curve_spline, cp_points=cp_curve_vel.size))
+                                              cp_curve_spline=cp_curve_spline, cp_points=cp_curve_wind_speed.size))
 
         # set up optimizer
         prob.driver = pyOptSparseDriver()
@@ -867,7 +867,7 @@ class GradientTestsGauss(unittest.TestCase):
         # prob['cut_in_speed'] = np.ones(nTurbines)*7.
         prob['rated_power'] = np.ones(nTurbines) * 2000.
         prob['cp_curve_cp'] = cp_curve_cp
-        prob['cp_curve_vel'] = cp_curve_vel
+        prob['cp_curve_wind_speed'] = cp_curve_wind_speed
 
         prob['model_params:wake_combination_method'] = wake_combination_method
         prob['model_params:ti_calculation_method'] = ti_calculation_method
@@ -1025,7 +1025,7 @@ class GradientTestsCpArray(unittest.TestCase):
         import cPickle as pickle
         data = pickle.load(open("./input_files/NREL5MWCPCT_dict.p", "r"))
 
-        cp_curve_vel = data["wind_speed"]
+        cp_curve_wind_speed = data["wind_speed"]
         cp_curve_cp = data["CP"]
         cp_points = cp_curve_cp.size
 
@@ -1045,7 +1045,7 @@ class GradientTestsCpArray(unittest.TestCase):
         prob['Ct_in'] = Ct
         prob['Cp_in'] = Cp
         prob['cp_curve_cp'] = cp_curve_cp
-        prob['cp_curve_vel'] = cp_curve_vel
+        prob['cp_curve_wind_speed'] = cp_curve_wind_speed
         prob['generatorEfficiency'] = generatorEfficiency
         prob['windSpeeds'] = np.array([wind_speed])
         prob['windFrequencies'] = np.array([wind_frequency])
@@ -1097,11 +1097,11 @@ class GradientTestsCpSpline(unittest.TestCase):
         import cPickle as pickle
         data = pickle.load(open("./input_files/NREL5MWCPCT_dict.p", "r"))
 
-        cp_curve_vel = data["wind_speed"]
+        cp_curve_wind_speed = data["wind_speed"]
         cp_curve_cp = data["CP"]
         cp_points = cp_curve_cp.size
 
-        cp_curve_spline = UnivariateSpline(cp_curve_vel, cp_curve_cp, ext='const', k=1)
+        cp_curve_spline = UnivariateSpline(cp_curve_wind_speed, cp_curve_cp, ext='const', k=1)
         cp_curve_spline.set_smoothing_factor(.000001)
 
         # set up problem
@@ -1218,11 +1218,11 @@ class GradientTestsCtCpRotor(unittest.TestCase):
         np.testing.assert_allclose(self.J['all_directions.direction_group0.rotorGroup.CtCp'][('Ct_out', 'yaw0')]['J_fwd'], self.J['all_directions.direction_group0.rotorGroup.CtCp'][('Ct_out', 'yaw0')]['J_fd'], self.rtol, self.atol)
         np.testing.assert_allclose(self.J['all_directions.direction_group0.rotorGroup.CtCp'][('Ct_out', 'wtVelocity0')]['J_fwd'], self.J['all_directions.direction_group0.rotorGroup.CtCp'][('Ct_out', 'wtVelocity0')]['J_fd'], self.rtol, self.atol)
 
-class GradientTestsPower(unittest.TestCase):
+class GradientTestsPowerCP(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        super(GradientTestsPower, self).setUpClass()
+        super(GradientTestsPowerCP, self).setUpClass()
 
         nTurbines = 4
         self.rtol = 1E-6
@@ -1249,17 +1249,17 @@ class GradientTestsPower(unittest.TestCase):
 
         # air_density = 1.1716  # kg/m^3
         Ar = 0.25 * np.pi * rotorDiameter[0] ** 2
-        # cp_curve_vel = ct_curve[:, 0]
+        # cp_curve_wind_speed = ct_curve[:, 0]
         power_data = np.loadtxt('./input_files/niayifar_vestas_v80_power_curve_observed.txt', delimiter=',')
-        # cp_curve_cp = niayifar_power_model(cp_curve_vel)/(0.5*air_density*cp_curve_vel**3*Ar)
+        # cp_curve_cp = niayifar_power_model(cp_curve_wind_speed)/(0.5*air_density*cp_curve_wind_speed**3*Ar)
         cp_curve_cp = power_data[:, 1] * (1E6) / (0.5 * air_density * power_data[:, 0] ** 3 * Ar)
-        cp_curve_vel = power_data[:, 0]
-        cp_curve_spline = UnivariateSpline(cp_curve_vel, cp_curve_cp, ext='const')
+        cp_curve_wind_speed = power_data[:, 0]
+        cp_curve_spline = UnivariateSpline(cp_curve_wind_speed, cp_curve_cp, ext='const')
         cp_curve_spline.set_smoothing_factor(.0001)
 
         # set up problem
         prob = Problem(root=AEPGroup(nTurbines=nTurbines, use_rotor_components=False, wake_model=gauss_wrapper,
-                                     cp_points=cp_curve_vel.size, cp_curve_spline=cp_curve_spline))
+                                     cp_points=cp_curve_wind_speed.size, cp_curve_spline=cp_curve_spline))
 
         # initialize problem
         prob.setup()
@@ -1285,7 +1285,7 @@ class GradientTestsPower(unittest.TestCase):
         # prob['cut_in_speed'] = np.ones(nTurbines)*7.
         prob['rated_power'] = np.ones(nTurbines) * 2000.
         prob['cp_curve_cp'] = cp_curve_cp
-        prob['cp_curve_vel'] = cp_curve_vel
+        prob['cp_curve_wind_speed'] = cp_curve_wind_speed
         # prob['use_cp_spline'] = True
 
         # run problem
@@ -1303,6 +1303,119 @@ class GradientTestsPower(unittest.TestCase):
         np.testing.assert_allclose(self.J['all_directions.direction_group0.powerComp'][('dir_power0', 'wtVelocity0')]['J_fwd'], self.J['all_directions.direction_group0.powerComp'][('dir_power0', 'wtVelocity0')]['J_fd'], self.rtol, self.atol)
         np.testing.assert_allclose(self.J['all_directions.direction_group0.powerComp'][('dir_power0', 'Cp')]['J_fwd'], self.J['all_directions.direction_group0.powerComp'][('dir_power0', 'Cp')]['J_fd'], self.rtol, self.atol)
         np.testing.assert_allclose(self.J['all_directions.direction_group0.powerComp'][('dir_power0', 'rotorDiameter')]['J_fwd'], self.J['all_directions.direction_group0.powerComp'][('dir_power0', 'rotorDiameter')]['J_fd'], self.rtol, self.atol)
+
+class GradientTestsPowerCurveDefinition(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(self):
+        super(GradientTestsPowerCurveDefinition, self).setUpClass()
+
+        nTurbines = 4
+        self.rtol = 1E-6
+        self.atol = 1E-6
+
+        np.random.seed(seed=10)
+
+        turbineX = np.random.rand(nTurbines)*3000.
+        turbineY = np.random.rand(nTurbines)*3000.
+
+        # initialize input variable arrays
+        rotorDiameter = np.ones(nTurbines)*np.random.random()*150.
+        axialInduction = np.ones(nTurbines)*np.random.random()*(1./3.)
+        Ct = np.ones(nTurbines)*np.random.random()
+        Cp = np.ones(nTurbines)*np.random.random()
+        generatorEfficiency = np.ones(nTurbines)*np.random.random()
+        yaw = np.random.rand(nTurbines)*60. - 30.
+
+        # Define flow properties
+        wind_speed = np.random.random()*20.       # m/s
+        air_density = 1.1716    # kg/m^3
+        wind_direction = np.random.random()*360    # deg (N = 0 deg., using direction FROM, as in met-mast data)
+        wind_frequency = np.random.random()    # probability of wind in given direction
+
+        # air_density = 1.1716  # kg/m^3
+        Ar = 0.25 * np.pi * rotorDiameter[0] ** 2
+
+        # set up problem
+        prob = Problem(root=AEPGroup(nTurbines=nTurbines, use_rotor_components=False, wake_model=gauss_wrapper))
+
+        # initialize problem
+        prob.setup()
+
+        # assign values to constant inputs (not design variables)
+                # assign values to constant inputs (not design variables)
+        prob['turbineX'] = turbineX
+        prob['turbineY'] = turbineY
+        prob['yaw0'] = yaw
+        prob['rotorDiameter'] = rotorDiameter
+        prob['axialInduction'] = axialInduction
+        prob['Ct_in'] = Ct
+        prob['Cp_in'] = Cp
+        prob['generatorEfficiency'] = generatorEfficiency
+        prob['windSpeeds'] = np.array([wind_speed])
+        prob['windFrequencies'] = np.array([wind_frequency])
+        prob['air_density'] = air_density
+        prob['windDirections'] = np.array([wind_direction])
+        prob['model_params:FLORISoriginal'] = False
+
+
+        prob['cut_in_speed'] = np.ones(nTurbines) * 4.
+        prob['cut_out_speed'] = np.ones(nTurbines)*7.
+        prob['rated_power'] = np.ones(nTurbines) * 2000.
+        prob['rated_wind_speed'] = np.ones(nTurbines)*15.
+        prob['use_power_curve_definition'] = True
+
+        # run problem
+        prob.run()
+        self.prob=prob
+        # pass gradient test results to self for use with unit tests
+        self.J = prob.check_partial_derivatives(out_stream=None)
+
+    def testPower_wtPower(self):
+        np.testing.assert_allclose(self.J['all_directions.direction_group0.powerComp'][('wtPower0', 'wtVelocity0')]['J_fwd'], self.J['all_directions.direction_group0.powerComp'][('wtPower0', 'wtVelocity0')]['J_fd'], self.rtol, self.atol)
+        np.testing.assert_allclose(self.J['all_directions.direction_group0.powerComp'][('wtPower0', 'Cp')]['J_fwd'], self.J['all_directions.direction_group0.powerComp'][('wtPower0', 'Cp')]['J_fd'], self.rtol, self.atol)
+        np.testing.assert_allclose(self.J['all_directions.direction_group0.powerComp'][('wtPower0', 'rotorDiameter')]['J_fwd'], self.J['all_directions.direction_group0.powerComp'][('wtPower0', 'rotorDiameter')]['J_fd'], self.rtol, self.atol)
+
+    def testPower_totalpower(self):
+        np.testing.assert_allclose(self.J['all_directions.direction_group0.powerComp'][('dir_power0', 'wtVelocity0')]['J_fwd'], self.J['all_directions.direction_group0.powerComp'][('dir_power0', 'wtVelocity0')]['J_fd'], self.rtol, self.atol)
+        np.testing.assert_allclose(self.J['all_directions.direction_group0.powerComp'][('dir_power0', 'Cp')]['J_fwd'], self.J['all_directions.direction_group0.powerComp'][('dir_power0', 'Cp')]['J_fd'], self.rtol, self.atol)
+        np.testing.assert_allclose(self.J['all_directions.direction_group0.powerComp'][('dir_power0', 'rotorDiameter')]['J_fwd'], self.J['all_directions.direction_group0.powerComp'][('dir_power0', 'rotorDiameter')]['J_fd'], self.rtol, self.atol)
+
+    def testPower_wtPower_high(self):
+        prob = self.prob
+        prob['windSpeeds'] = np.array([20.])
+        prob.run()
+        J = prob.check_partial_derivatives(out_stream=None)
+        np.testing.assert_allclose(J['all_directions.direction_group0.powerComp'][('wtPower0', 'wtVelocity0')]['J_fwd'], J['all_directions.direction_group0.powerComp'][('wtPower0', 'wtVelocity0')]['J_fd'], self.rtol, self.atol)
+        np.testing.assert_allclose(J['all_directions.direction_group0.powerComp'][('wtPower0', 'Cp')]['J_fwd'], J['all_directions.direction_group0.powerComp'][('wtPower0', 'Cp')]['J_fd'], self.rtol, self.atol)
+        np.testing.assert_allclose(J['all_directions.direction_group0.powerComp'][('wtPower0', 'rotorDiameter')]['J_fwd'], J['all_directions.direction_group0.powerComp'][('wtPower0', 'rotorDiameter')]['J_fd'], self.rtol, self.atol)
+
+    def testPower_totalpower_high(self):
+        prob = self.prob
+        prob['windSpeeds'] = np.array([20.])
+        prob.run()
+        J = prob.check_partial_derivatives(out_stream=None)
+        np.testing.assert_allclose(J['all_directions.direction_group0.powerComp'][('dir_power0', 'wtVelocity0')]['J_fwd'], J['all_directions.direction_group0.powerComp'][('dir_power0', 'wtVelocity0')]['J_fd'], self.rtol, self.atol)
+        np.testing.assert_allclose(J['all_directions.direction_group0.powerComp'][('dir_power0', 'Cp')]['J_fwd'], J['all_directions.direction_group0.powerComp'][('dir_power0', 'Cp')]['J_fd'], self.rtol, self.atol)
+        np.testing.assert_allclose(J['all_directions.direction_group0.powerComp'][('dir_power0', 'rotorDiameter')]['J_fwd'], J['all_directions.direction_group0.powerComp'][('dir_power0', 'rotorDiameter')]['J_fd'], self.rtol, self.atol)
+
+    def testPower_wtPower_low(self):
+        prob = self.prob
+        prob['windSpeeds'] = np.array([1.])
+        prob.run()
+        J = prob.check_partial_derivatives(out_stream=None)
+        np.testing.assert_allclose(J['all_directions.direction_group0.powerComp'][('wtPower0', 'wtVelocity0')]['J_fwd'], J['all_directions.direction_group0.powerComp'][('wtPower0', 'wtVelocity0')]['J_fd'], self.rtol, self.atol)
+        np.testing.assert_allclose(J['all_directions.direction_group0.powerComp'][('wtPower0', 'Cp')]['J_fwd'], J['all_directions.direction_group0.powerComp'][('wtPower0', 'Cp')]['J_fd'], self.rtol, self.atol)
+        np.testing.assert_allclose(J['all_directions.direction_group0.powerComp'][('wtPower0', 'rotorDiameter')]['J_fwd'], J['all_directions.direction_group0.powerComp'][('wtPower0', 'rotorDiameter')]['J_fd'], self.rtol, self.atol)
+
+    def testPower_totalpower_low(self):
+        prob = self.prob
+        prob['windSpeeds'] = np.array([1.])
+        prob.run()
+        J = prob.check_partial_derivatives(out_stream=None)
+        np.testing.assert_allclose(J['all_directions.direction_group0.powerComp'][('dir_power0', 'wtVelocity0')]['J_fwd'], J['all_directions.direction_group0.powerComp'][('dir_power0', 'wtVelocity0')]['J_fd'], self.rtol, self.atol)
+        np.testing.assert_allclose(J['all_directions.direction_group0.powerComp'][('dir_power0', 'Cp')]['J_fwd'], J['all_directions.direction_group0.powerComp'][('dir_power0', 'Cp')]['J_fd'], self.rtol, self.atol)
+        np.testing.assert_allclose(J['all_directions.direction_group0.powerComp'][('dir_power0', 'rotorDiameter')]['J_fwd'], J['all_directions.direction_group0.powerComp'][('dir_power0', 'rotorDiameter')]['J_fd'], self.rtol, self.atol)
 
 class GradientTestsConstraintComponents(unittest.TestCase):
 
